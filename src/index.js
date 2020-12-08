@@ -1,4 +1,4 @@
-import { inv, multiply, Matrix }  from 'mathjs';
+import { inv, multiply }  from 'mathjs';
 const getEventInfo = (event) => ({
     pointerId: event.pointerId,
     pressure: event.pressure,
@@ -92,8 +92,6 @@ const drawTheThings = (context, strokes, w, h, x, y, scale) => {
     context.restore();
 };
 
-const getLen = (x, y) => Math.sqrt(x * x + y * y);
-
 const screenToWorld = (x, y, tX, tY, scale) => {
     const i = inv([
         [scale, 0, tX],
@@ -129,10 +127,16 @@ export const startUp = (document) => {
         if (!isPen(event)) return;
 
         if (drawing) {
-            
+            const worldPoint = screenToWorld(
+                event.clientX,
+                event.clientY,
+                offset.x,
+                offset.y,
+                scale
+            );
             strokes.addPointToStroke(
-                (event.clientX - offset.x) * scale, 
-                (event.clientY - offset.y) * scale, 
+                worldPoint.x, 
+                worldPoint.y, 
                 event.pressure);
         } else if (event.ctrlKey) {
             offset.x += event.movementX;
@@ -160,10 +164,16 @@ export const startUp = (document) => {
 
         if (event.buttons === 1) {
             drawing = true;
-
+            const worldPoint = screenToWorld(
+                event.clientX,
+                event.clientY,
+                offset.x,
+                offset.y,
+                scale
+            );
             strokes.startStroke(
-                (event.clientX - offset.x) * scale, 
-                (event.clientY - offset.y) * scale, 
+                worldPoint.x, 
+                worldPoint.y, 
                 event.pressure);
         }
 
