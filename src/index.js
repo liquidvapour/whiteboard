@@ -56,9 +56,12 @@ const drawLine = (context, x0, y0, x1, y1, pressure) => {
     context.stroke();
 };
 
-const drawTheThings = (context, strokes, w, h) => {
+const drawTheThings = (context, strokes, w, h, x, y) => {
+    context.save()
     context.fillStyle = "#AAAAAA";
     context.fillRect(0, 0, w, h);
+    
+    context.translate(x, y);
 
     for (let i = 0; i < strokes.strokes.length; i++) {
         const stroke = strokes.strokes[i];
@@ -82,6 +85,7 @@ const drawTheThings = (context, strokes, w, h) => {
         }
         context.closePath();
     }
+    context.restore();
 };
 
 export const startUp = (document) => {
@@ -99,14 +103,35 @@ export const startUp = (document) => {
 
     var drawing = false;
 
+    const offset = { x: 0, y: 0 };
+
     const move_handler = (event) => { 
         showInfo("move", event);
 
+        if (!isPen(event)) return;
+
         if (drawing) {
-            window.requestAnimationFrame(() => drawTheThings(context, strokes))
+            window.requestAnimationFrame(() => drawTheThings(
+                context,
+                strokes,
+                canvas.width,
+                canvas.height,
+                offset.x,
+                offset.y));
 
             strokes.addPointToStroke(event.clientX, event.clientY, event.pressure);
+        } else if (event.ctrlKey) {
+            offset.x += event.movementX;
+            offset.y += event.movementY;
+            window.requestAnimationFrame(() => drawTheThings(
+                context,
+                strokes,
+                canvas.width,
+                canvas.height,
+                offset.x,
+                offset.y));
         }
+
         event.cancelBubble = true;
     };
 
@@ -115,7 +140,6 @@ export const startUp = (document) => {
 
         if (!isPen(event)) return;
 
-        
         if (event.buttons === 1) {
             drawing = true;
 
