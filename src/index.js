@@ -3,28 +3,31 @@ const getEventInfo = (event) => ({
     pointerId: event.pointerId,
     pressure: event.pressure,
     pointerType: event.pointerType,
-    buttons: event.buttons,
-    pointerTye: event.pointerType
+    buttons: event.buttons
 });
 
+const showInfo = (name, event) => {
+    console.log(`${name}: ${JSON.stringify(getEventInfo(event))}`);
+};
+
 function over_handler(event) {
-    console.log("over_handler: " + JSON.stringify(event));
+    showInfo("over", event);
 }
-function enter_handler(event) { 
-    console.log("enter_handler: " + JSON.stringify(event));
-}
+
 function out_handler(event) { 
-    console.log("out_handler: " + JSON.stringify(event));
+    showInfo("out" , event);
 }
 function leave_handler(event) { 
-    console.log("leave_handler: " + JSON.stringify(event));
+    showInfo("leave", event);
 }
 function gotcapture_handler(event) { 
-    console.log("gotcapture_handler: " + JSON.stringify(event));
+    showInfo("gotcapture", event);
 }
 function lostcapture_handler(event) { 
-    console.log("lostcapture_handler: " + JSON.stringify(event));
+    showInfo("lostcapture", event);
 }
+
+const isPen = (event) => event.pointerType === "pen";
 
 class Strokes {
     constructor() {
@@ -45,6 +48,42 @@ class Strokes {
     }
 }
 
+const drawLine = (context, x0, y0, x1, y1, pressure) => {
+    context.moveTo(x0, y0);
+    context.lineTo(x1, y1);
+    context.strokeStyle = 'black';
+    context.lineWidth = 40 * pressure;
+    context.stroke();
+};
+
+const drawTheThings = (context, strokes, w, h) => {
+    context.fillStyle = "#AAAAAA";
+    context.fillRect(0, 0, w, h);
+
+    for (let i = 0; i < strokes.strokes.length; i++) {
+        const stroke = strokes.strokes[i];
+        let firstPoint = true;
+        let lastX, lastY, lastP = null;
+        context.beginPath();
+        for (let s = 0; s < stroke.x.length; s++) {
+            const x = stroke.x[s];
+            const y = stroke.y[s];
+            const p = stroke.pressure[s];
+
+            if (firstPoint) {
+                firstPoint = false;
+            } else {
+                drawLine(context, lastX, lastY, x, y, lastP);                
+            }
+            lastX = x;
+            lastY = y;
+            lastP = p;
+        
+        }
+        context.closePath();
+    }
+};
+
 export const startUp = (document) => {
     const canvas = document.createElement("canvas");
     //const canvas = document.getElementById("canvas");    
@@ -55,51 +94,52 @@ export const startUp = (document) => {
     const strokes = new Strokes();
 
     const context = canvas.getContext("2d", { alpha: false });
-    context.fillStyle = "#AAAAAA";
+    context.fillStyle = "#DDDDDD";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     var drawing = false;
-    var current = { x: 0, y: 0 };
 
     const move_handler = (event) => { 
-        console.log(`down_handler: ${JSON.stringify(getEventInfo(event))}`);
-        if (drawing) {
-            drawLine(current.x, current.y, event.clientX, event.clientY, event.pressure, true);
+        showInfo("move", event);
 
-            current.x = event.clientX;
-            current.y = event.clientY;
+        if (drawing) {
+            window.requestAnimationFrame(() => drawTheThings(context, strokes))
 
             strokes.addPointToStroke(event.clientX, event.clientY, event.pressure);
         }
+        event.cancelBubble = true;
     };
 
     const down_handler = (event) => { 
-        if (event.pointerType === "pen") {
-            if (event.buttons === 1) {
-                drawing = true;
+        showInfo("down", event);
 
-                strokes.startStroke(event.clientX, event.clientY, event.pressure);
+        if (!isPen(event)) return;
 
-                current.x = event.clientX;
-                current.y = event.clientY;
-            }
+        
+        if (event.buttons === 1) {
+            drawing = true;
+
+            strokes.startStroke(event.clientX, event.clientY, event.pressure);
         }
-        console.log(`down_handler: ${JSON.stringify(getEventInfo(event))}`);
+
+        event.cancelBubble = true;
     };
 
     const up_handler = () => { 
+        if (!isPen(event)) return;
+
         drawing = false;
+        event.cancelBubble = true;
     }
 
-    const drawLine = (x0, y0, x1, y1, pressure) => {
-        context.beginPath();
-        context.moveTo(x0, y0);
-        context.lineTo(x1, y1);
-        context.strokeStyle = 'black';
-        context.lineWidth = 40 * pressure;
-        context.stroke();
-        context.closePath();
-    };
+    function enter_handler(event) { 
+        if (!isPen(event)) return;
+        showInfo("enter", event);
+
+        if (event.pointerType === "pen") {
+            canvas.setPointerCapture(event.pointerId);
+        }
+    }
 
     canvas.onpointerover = over_handler;
     canvas.onpointerenter = enter_handler;
@@ -111,6 +151,7 @@ export const startUp = (document) => {
     canvas.onpointerleave = leave_handler;
     canvas.gotpointercapture = gotcapture_handler;
     canvas.lostpointercapture = lostcapture_handler;
+    canvas.oncontextmenu = e => e.preventDefault();
 };
 
 startUp(document);
