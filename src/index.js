@@ -125,7 +125,7 @@ export const startUp = (document) => {
         event.cancelBubble = true;
     };
 
-    const up_handler = () => { 
+    const up_handler = (event) => { 
         if (!isPen(event)) return;
 
         drawing = false;
