@@ -26,6 +26,25 @@ function lostcapture_handler(event) {
     console.log("lostcapture_handler: " + JSON.stringify(event));
 }
 
+class Strokes {
+    constructor() {
+        this.strokes = [];
+        this.currentStroke = null;
+    }
+
+    startStroke(x, y, pressure) {
+        this.currentStroke = {x:[x], y:[y], pressure:[pressure]};
+        this.strokes.push(this.currentStroke);
+    }
+
+    addPointToStroke(x, y, pressure) {
+        const s = this.currentStroke;
+        s.x.push(x);
+        s.y.push(y);
+        s.pressure.push(pressure);
+    }
+}
+
 export const startUp = (document) => {
     const canvas = document.createElement("canvas");
     //const canvas = document.getElementById("canvas");    
@@ -33,7 +52,11 @@ export const startUp = (document) => {
     canvas.height = window.innerHeight;
     document.body.append(canvas);
 
-    const context = canvas.getContext("2d");
+    const strokes = new Strokes();
+
+    const context = canvas.getContext("2d", { alpha: false });
+    context.fillStyle = "#AAAAAA";
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
     var drawing = false;
     var current = { x: 0, y: 0 };
@@ -45,6 +68,8 @@ export const startUp = (document) => {
 
             current.x = event.clientX;
             current.y = event.clientY;
+
+            strokes.addPointToStroke(event.clientX, event.clientY, event.pressure);
         }
     };
 
@@ -52,6 +77,8 @@ export const startUp = (document) => {
         if (event.pointerType === "pen") {
             if (event.buttons === 1) {
                 drawing = true;
+
+                strokes.startStroke(event.clientX, event.clientY, event.pressure);
 
                 current.x = event.clientX;
                 current.y = event.clientY;
