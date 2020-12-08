@@ -1,10 +1,12 @@
-
+import { inv, multiply, Matrix }  from 'mathjs';
 const getEventInfo = (event) => ({
     pointerId: event.pointerId,
     pressure: event.pressure,
     pointerType: event.pointerType,
     buttons: event.buttons
 });
+
+
 
 const showInfo = (name, event) => {
     console.log(`${name}: ${JSON.stringify(getEventInfo(event))}`);
@@ -56,12 +58,14 @@ const drawLine = (context, x0, y0, x1, y1, pressure) => {
     context.stroke();
 };
 
-const drawTheThings = (context, strokes, w, h, x, y) => {
+const drawTheThings = (context, strokes, w, h, x, y, scale) => {
     context.save()
     context.fillStyle = "#AAAAAA";
     context.fillRect(0, 0, w, h);
     
-    context.translate(x, y);
+    context.transform(scale, 0, 0, scale, x, y);
+    //context.scale(scale, scale);
+    //context.translate(x, y);
 
     for (let i = 0; i < strokes.strokes.length; i++) {
         const stroke = strokes.strokes[i];
@@ -88,6 +92,19 @@ const drawTheThings = (context, strokes, w, h, x, y) => {
     context.restore();
 };
 
+const getLen = (x, y) => Math.sqrt(x * x + y * y);
+
+const screenToWorld = (x, y, tX, tY, scale) => {
+    const i = inv([
+        [scale, 0, tX],
+        [0, scale, tY], 
+        [0, 0, 1]]);
+    const r = multiply([x, y, 0], i);
+    return { x: r[0], y: r[1] };
+};
+
+
+
 export const startUp = (document) => {
     const canvas = document.createElement("canvas");
     //const canvas = document.getElementById("canvas");    
@@ -104,6 +121,7 @@ export const startUp = (document) => {
     var drawing = false;
 
     const offset = { x: 0, y: 0 };
+    let scale = 1.0;
 
     const move_handler = (event) => { 
         showInfo("move", event);
@@ -111,26 +129,26 @@ export const startUp = (document) => {
         if (!isPen(event)) return;
 
         if (drawing) {
-            window.requestAnimationFrame(() => drawTheThings(
-                context,
-                strokes,
-                canvas.width,
-                canvas.height,
-                offset.x,
-                offset.y));
-
-            strokes.addPointToStroke(event.clientX - offset.x, event.clientY - offset.y, event.pressure);
+            
+            strokes.addPointToStroke(
+                (event.clientX - offset.x) * scale, 
+                (event.clientY - offset.y) * scale, 
+                event.pressure);
         } else if (event.ctrlKey) {
             offset.x += event.movementX;
             offset.y += event.movementY;
-            window.requestAnimationFrame(() => drawTheThings(
-                context,
-                strokes,
-                canvas.width,
-                canvas.height,
-                offset.x,
-                offset.y));
+        } else if (event.shiftKey) {
+            scale += event.movementY * 0.01;
         }
+
+        window.requestAnimationFrame(() => drawTheThings(
+            context,
+            strokes,
+            canvas.width,
+            canvas.height,
+            offset.x,
+            offset.y,
+            scale));
 
         event.cancelBubble = true;
     };
@@ -143,7 +161,10 @@ export const startUp = (document) => {
         if (event.buttons === 1) {
             drawing = true;
 
-            strokes.startStroke(event.clientX - offset.x, event.clientY - offset.y, event.pressure);
+            strokes.startStroke(
+                (event.clientX - offset.x) * scale, 
+                (event.clientY - offset.y) * scale, 
+                event.pressure);
         }
 
         event.cancelBubble = true;
