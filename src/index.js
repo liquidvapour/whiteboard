@@ -119,7 +119,7 @@ export const startUp = (document) => {
                 offset.x,
                 offset.y));
 
-            strokes.addPointToStroke(event.clientX, event.clientY, event.pressure);
+            strokes.addPointToStroke(event.clientX - offset.x, event.clientY - offset.y, event.pressure);
         } else if (event.ctrlKey) {
             offset.x += event.movementX;
             offset.y += event.movementY;
@@ -143,7 +143,7 @@ export const startUp = (document) => {
         if (event.buttons === 1) {
             drawing = true;
 
-            strokes.startStroke(event.clientX, event.clientY, event.pressure);
+            strokes.startStroke(event.clientX - offset.x, event.clientY - offset.y, event.pressure);
         }
 
         event.cancelBubble = true;
