@@ -1,12 +1,11 @@
 import { inv, multiply }  from 'mathjs';
+
 const getEventInfo = (event) => ({
     pointerId: event.pointerId,
     pressure: event.pressure,
     pointerType: event.pointerType,
     buttons: event.buttons
 });
-
-
 
 const showInfo = (name, event) => {
     console.log(`${name}: ${JSON.stringify(getEventInfo(event))}`);
@@ -92,10 +91,10 @@ const drawTheThings = (context, strokes, w, h, x, y, scale) => {
     context.restore();
 };
 
-const screenToWorld = (x, y, tX, tY, scale) => {
+const screenToWorld = (x, y, tx, ty, s) => {
     const i = inv([
-        [scale, 0, tX],
-        [0, scale, tY], 
+        [s, 0, tx],
+        [0, s, ty], 
         [0, 0, 1]]);
     const r = multiply([x, y, 0], i);
     return { x: r[0], y: r[1] };
