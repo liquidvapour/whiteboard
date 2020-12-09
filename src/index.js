@@ -99,8 +99,8 @@ const matrixSetScale = (m, s) => {
 };
 
 const matrixSetTranslation = (m, x, y) => {
-    m[0][2] = x;
-    m[1][2] = y;
+    m[2][0] = x;
+    m[2][1] = y;
 };
 
 const matrixCreateDefault = () => identity(3);
@@ -135,6 +135,8 @@ export const startUp = (document) => {
 
     const screenToWorld = (x, y) => {
         const r = multiply([x, y, 1], worldMatrixInv);
+        console.log(`screen {x: ${x}, y: ${y}}`);
+        console.log(`world {x: ${r[0]}, y: ${r[1]}}`);
         return { x: r[0], y: r[1] };
     };
 
@@ -157,7 +159,7 @@ export const startUp = (document) => {
             offset.y += event.movementY;
             updateWorldMatrix(offset.x, offset.y, scale);
         } else if (event.shiftKey) {
-            scale += event.movementY * 0.01;
+            scale = Math.max(0.05, scale + event.movementY * 0.01);
             updateWorldMatrix(offset.x, offset.y, scale);
         }
 
