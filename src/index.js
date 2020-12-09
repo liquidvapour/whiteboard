@@ -1,4 +1,4 @@
-import { inv, multiply }  from 'mathjs';
+import { inv, multiply, identity }  from 'mathjs';
 
 const getEventInfo = (event) => ({
     pointerId: event.pointerId,
@@ -91,16 +91,19 @@ const drawTheThings = (context, strokes, w, h, x, y, scale) => {
     context.restore();
 };
 
-const screenToWorld = (x, y, tx, ty, s) => {
-    const i = inv([
-        [s, 0, tx],
-        [0, s, ty], 
-        [0, 0, 1]]);
-    const r = multiply([x, y, 0], i);
-    return { x: r[0], y: r[1] };
+
+
+const matrixSetScale = (m, s) => {
+    m[0][0] = s;
+    m[1][1] = s;
 };
 
+const matrixSetTranslation = (m, x, y) => {
+    m[0][2] = x;
+    m[1][2] = y;
+};
 
+const matrixCreateDefault = () => identity(3);
 
 export const startUp = (document) => {
     const canvas = document.createElement("canvas");
@@ -119,6 +122,21 @@ export const startUp = (document) => {
 
     const offset = { x: 0, y: 0 };
     let scale = 1.0;
+    const worldMatrix = matrixCreateDefault().toArray();
+    let worldMatrixInv = inv(worldMatrix);
+
+    const updateWorldMatrix = (x, y, s) => {
+        matrixSetTranslation(worldMatrix, x, y);
+        matrixSetScale(worldMatrix, s);
+        worldMatrixInv = inv(worldMatrix);
+        console.log(JSON.stringify(worldMatrix));
+        console.log(JSON.stringify(worldMatrixInv));
+    };
+
+    const screenToWorld = (x, y) => {
+        const r = multiply([x, y, 0], worldMatrixInv);
+        return { x: r[0], y: r[1] };
+    };
 
     const move_handler = (event) => { 
         showInfo("move", event);
@@ -128,10 +146,7 @@ export const startUp = (document) => {
         if (drawing) {
             const worldPoint = screenToWorld(
                 event.clientX,
-                event.clientY,
-                offset.x,
-                offset.y,
-                scale
+                event.clientY
             );
             strokes.addPointToStroke(
                 worldPoint.x, 
@@ -140,8 +155,10 @@ export const startUp = (document) => {
         } else if (event.ctrlKey) {
             offset.x += event.movementX;
             offset.y += event.movementY;
+            updateWorldMatrix(offset.x, offset.y, scale);
         } else if (event.shiftKey) {
             scale += event.movementY * 0.01;
+            updateWorldMatrix(offset.x, offset.y, scale);
         }
 
         window.requestAnimationFrame(() => drawTheThings(
@@ -165,10 +182,7 @@ export const startUp = (document) => {
             drawing = true;
             const worldPoint = screenToWorld(
                 event.clientX,
-                event.clientY,
-                offset.x,
-                offset.y,
-                scale
+                event.clientY
             );
             strokes.startStroke(
                 worldPoint.x, 
