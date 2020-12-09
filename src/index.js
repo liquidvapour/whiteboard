@@ -134,7 +134,7 @@ export const startUp = (document) => {
     };
 
     const screenToWorld = (x, y) => {
-        const r = multiply([x, y, 0], worldMatrixInv);
+        const r = multiply([x, y, 1], worldMatrixInv);
         return { x: r[0], y: r[1] };
     };
 
