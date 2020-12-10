@@ -59,7 +59,7 @@ const drawLine = (context, x0, y0, x1, y1, pressure) => {
     context.stroke();
 };
 
-const drawTheThings = (context, strokes, w, h, x, y, scale) => {
+const drawTheThings = (context, strokes, w, h, x, y, scale, scalingCenter) => {
     context.save()
     context.fillStyle = "#AAAAAA";
     context.fillRect(0, 0, w, h);
@@ -167,8 +167,8 @@ const startUp = (document) => {
                 worldPoint.y, 
                 event.pressure);
         } else if (event.ctrlKey) {
-            offset.x += event.movementX;
-            offset.y += event.movementY;
+            offset.x += event.movementX * (1 / scale);
+            offset.y += event.movementY * (1 / scale);
             matrixSetTranslation(offset.x, offset.y);
         }
         
