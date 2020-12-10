@@ -1,5 +1,7 @@
 import { inv, multiply, identity }  from 'mathjs';
 
+ //import { scaleAround } from './utils';
+
 const getEventInfo = (event) => ({
     pointerId: event.pointerId,
     pressure: event.pressure,
@@ -57,15 +59,14 @@ const drawLine = (context, x0, y0, x1, y1, pressure) => {
     context.stroke();
 };
 
-const drawTheThings = (context, strokes, w, h, x, y, scale, scalingCenter) => {
+const drawTheThings = (context, strokes, w, h, x, y) => {
     context.save()
     context.fillStyle = "#AAAAAA";
     context.fillRect(0, 0, w, h);
     
-    //context.transform(scale, 0, 0, scale, x, y);
-    context.translate(scalingCenter.x, scalingCenter.y);
-    context.scale(scale, scale);
-    context.translate(-scalingCenter.x, -scalingCenter.y);
+    // context.translate(scalingCenter.x, scalingCenter.y);
+    // context.scale(scale, scale);
+    // context.translate(-scalingCenter.x, -scalingCenter.y);
     context.translate(x, y);
 
     for (let i = 0; i < strokes.strokes.length; i++) {
@@ -123,11 +124,11 @@ export const startUp = (document) => {
     const worldMatrix = matrixCreateDefault().toArray();
     let worldMatrixInv = inv(worldMatrix);
 
-    const matrixSetScale = (s) => {
-        worldMatrix[0][0] = s;
-        worldMatrix[1][1] = s;
-        worldMatrixInv = inv(worldMatrix);
-    };
+    // const matrixSetScale = (s) => {
+    //     worldMatrix[0][0] = s;
+    //     worldMatrix[1][1] = s;
+    //     worldMatrixInv = inv(worldMatrix);
+    // };
     
     const matrixSetTranslation = (x, y) => {
         worldMatrix[2][0] = x;
@@ -182,10 +183,8 @@ export const startUp = (document) => {
                 scaling = true;
             }
             scale = Math.max(0.05, scale + event.movementY * 0.01);
-            matrixSetScale(scale);
-            const newOffset = screenToWorld(offset.x, offset.y);
-            offset.x = newOffset.x;
-            offset.y = newOffset.y;
+            //matrixSetScale(scale);
+            
         } else {
             scaling = false;
         }
