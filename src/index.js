@@ -11,21 +11,21 @@ const showInfo = (name, event) => {
     console.log(`${name}: ${JSON.stringify(getEventInfo(event))}`);
 };
 
-function over_handler(event) {
-    showInfo("over", event);
+function over_handler() {
+    //showInfo("over", event);
 }
 
-function out_handler(event) { 
-    showInfo("out" , event);
+function out_handler() { 
+    //showInfo("out" , event);
 }
-function leave_handler(event) { 
-    showInfo("leave", event);
+function leave_handler() { 
+    //showInfo("leave", event);
 }
-function gotcapture_handler(event) { 
-    showInfo("gotcapture", event);
+function gotcapture_handler() { 
+    //showInfo("gotcapture", event);
 }
-function lostcapture_handler(event) { 
-    showInfo("lostcapture", event);
+function lostcapture_handler() { 
+    //showInfo("lostcapture", event);
 }
 
 const isPen = (event) => event.pointerType === "pen";
@@ -57,14 +57,16 @@ const drawLine = (context, x0, y0, x1, y1, pressure) => {
     context.stroke();
 };
 
-const drawTheThings = (context, strokes, w, h, x, y, scale) => {
+const drawTheThings = (context, strokes, w, h, x, y, scale, scalingCenter) => {
     context.save()
     context.fillStyle = "#AAAAAA";
     context.fillRect(0, 0, w, h);
     
-    context.transform(scale, 0, 0, scale, x, y);
-    //context.scale(scale, scale);
-    //context.translate(x, y);
+    //context.transform(scale, 0, 0, scale, x, y);
+    context.translate(scalingCenter.x, scalingCenter.y);
+    context.scale(scale, scale);
+    context.translate(-scalingCenter.x, -scalingCenter.y);
+    context.translate(x, y);
 
     for (let i = 0; i < strokes.strokes.length; i++) {
         const stroke = strokes.strokes[i];
@@ -93,17 +95,10 @@ const drawTheThings = (context, strokes, w, h, x, y, scale) => {
 
 
 
-const matrixSetScale = (m, s) => {
-    m[0][0] = s;
-    m[1][1] = s;
-};
-
-const matrixSetTranslation = (m, x, y) => {
-    m[2][0] = x;
-    m[2][1] = y;
-};
 
 const matrixCreateDefault = () => identity(3);
+
+const newV2 = (x = 0, y = 0) => ({ x, y });
 
 export const startUp = (document) => {
     const canvas = document.createElement("canvas");
@@ -118,30 +113,37 @@ export const startUp = (document) => {
     context.fillStyle = "#DDDDDD";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    var drawing = false;
+    let drawing = false;
+    let scaling = false;
+    const scalingCenter = newV2();
+    const screenTopLeftAtScaleStartInWorldSpace = newV2();
 
-    const offset = { x: 0, y: 0 };
+    const offset = newV2();
     let scale = 1.0;
     const worldMatrix = matrixCreateDefault().toArray();
     let worldMatrixInv = inv(worldMatrix);
 
-    const updateWorldMatrix = (x, y, s) => {
-        matrixSetTranslation(worldMatrix, x, y);
-        matrixSetScale(worldMatrix, s);
+    const matrixSetScale = (s) => {
+        worldMatrix[0][0] = s;
+        worldMatrix[1][1] = s;
         worldMatrixInv = inv(worldMatrix);
-        console.log(JSON.stringify(worldMatrix));
-        console.log(JSON.stringify(worldMatrixInv));
+    };
+    
+    const matrixSetTranslation = (x, y) => {
+        worldMatrix[2][0] = x;
+        worldMatrix[2][1] = y;
+        worldMatrixInv = inv(worldMatrix);
     };
 
     const screenToWorld = (x, y) => {
         const r = multiply([x, y, 1], worldMatrixInv);
-        console.log(`screen {x: ${x}, y: ${y}}`);
-        console.log(`world {x: ${r[0]}, y: ${r[1]}}`);
+        //console.log(`screen {x: ${x}, y: ${y}}`);
+        //console.log(`world {x: ${r[0]}, y: ${r[1]}}`);
         return { x: r[0], y: r[1] };
     };
 
     const move_handler = (event) => { 
-        showInfo("move", event);
+        //showInfo("move", event);
 
         if (!isPen(event)) return;
 
@@ -157,10 +159,35 @@ export const startUp = (document) => {
         } else if (event.ctrlKey) {
             offset.x += event.movementX;
             offset.y += event.movementY;
-            updateWorldMatrix(offset.x, offset.y, scale);
-        } else if (event.shiftKey) {
+            matrixSetTranslation(offset.x, offset.y);
+        }
+        
+        if (event.shiftKey) {
+            if (!scaling) {
+                const worldPoint = screenToWorld(
+                    event.clientX,
+                    event.clientY
+                )
+                scalingCenter.x = worldPoint.x;
+                scalingCenter.y = worldPoint.y;
+
+                console.log(`start scaling at: ${JSON.stringify(worldPoint)}`)
+
+                const screenOriginInWorldSpace = screenToWorld(0, 0);
+                screenTopLeftAtScaleStartInWorldSpace.x = screenOriginInWorldSpace.x;
+                screenTopLeftAtScaleStartInWorldSpace.y = screenOriginInWorldSpace.y;
+
+                console.log(`screen origin in world space: ${JSON.stringify(screenTopLeftAtScaleStartInWorldSpace)}`)
+
+                scaling = true;
+            }
             scale = Math.max(0.05, scale + event.movementY * 0.01);
-            updateWorldMatrix(offset.x, offset.y, scale);
+            matrixSetScale(scale);
+            const newOffset = screenToWorld(offset.x, offset.y);
+            offset.x = newOffset.x;
+            offset.y = newOffset.y;
+        } else {
+            scaling = false;
         }
 
         window.requestAnimationFrame(() => drawTheThings(
@@ -170,7 +197,8 @@ export const startUp = (document) => {
             canvas.height,
             offset.x,
             offset.y,
-            scale));
+            scale,
+            scalingCenter));
 
         event.cancelBubble = true;
     };
