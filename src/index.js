@@ -1,4 +1,4 @@
-import { inv, multiply, identity }  from 'mathjs';
+import { multiply, identity }  from 'mathjs';
 
  //import { scaleAround } from './utils';
 
@@ -59,13 +59,13 @@ const drawLine = (context, x0, y0, x1, y1, pressure) => {
     context.stroke();
 };
 
-const drawTheThings = (context, strokes, w, h, x, y) => {
+const drawTheThings = (context, strokes, w, h, x, y, scale) => {
     context.save()
     context.fillStyle = "#AAAAAA";
     context.fillRect(0, 0, w, h);
     
     // context.translate(scalingCenter.x, scalingCenter.y);
-    // context.scale(scale, scale);
+    context.scale(scale, scale);
     // context.translate(-scalingCenter.x, -scalingCenter.y);
     context.translate(x, y);
 
@@ -101,7 +101,13 @@ const matrixCreateDefault = () => identity(3);
 
 const newV2 = (x = 0, y = 0) => ({ x, y });
 
-export const startUp = (document) => {
+const myInv = (m) => ([
+    [1/m[0][0], 0, 0],
+    [0, 1/m[1][1], 0],
+    [-m[2][0], -m[2][1], 1]
+]);
+
+const startUp = (document) => {
     const canvas = document.createElement("canvas");
     //const canvas = document.getElementById("canvas");    
     canvas.width = window.innerWidth;
@@ -122,24 +128,27 @@ export const startUp = (document) => {
     const offset = newV2();
     let scale = 1.0;
     const worldMatrix = matrixCreateDefault().toArray();
-    let worldMatrixInv = inv(worldMatrix);
+    let worldMatrixInv = myInv(worldMatrix);
 
-    // const matrixSetScale = (s) => {
-    //     worldMatrix[0][0] = s;
-    //     worldMatrix[1][1] = s;
-    //     worldMatrixInv = inv(worldMatrix);
-    // };
+
+    const matrixSetScale = (s) => {
+        worldMatrix[0][0] = s;
+        worldMatrix[1][1] = s;
+        worldMatrixInv = myInv(worldMatrix);
+    };
     
     const matrixSetTranslation = (x, y) => {
         worldMatrix[2][0] = x;
         worldMatrix[2][1] = y;
-        worldMatrixInv = inv(worldMatrix);
+        worldMatrixInv = myInv(worldMatrix);
     };
 
     const screenToWorld = (x, y) => {
         const r = multiply([x, y, 1], worldMatrixInv);
-        //console.log(`screen {x: ${x}, y: ${y}}`);
-        //console.log(`world {x: ${r[0]}, y: ${r[1]}}`);
+        console.log(`world: ${worldMatrix}`);
+        console.log(`worldInv: ${worldMatrixInv}`);
+        console.log(`screen {x: ${x}, y: ${y}}`);
+        console.log(`world {x: ${r[0]}, y: ${r[1]}}`);
         return { x: r[0], y: r[1] };
     };
 
@@ -183,7 +192,7 @@ export const startUp = (document) => {
                 scaling = true;
             }
             scale = Math.max(0.05, scale + event.movementY * 0.01);
-            //matrixSetScale(scale);
+            matrixSetScale(scale);
             
         } else {
             scaling = false;
