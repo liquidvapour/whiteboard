@@ -7,7 +7,7 @@ module.exports = [{
       main: './src/ui/index.js',      
     },
     output: {
-        path: path.resolve(__dirname, 'dist/ui/script'),
+        path: path.resolve(__dirname, 'dist/server/ui/script'),
         filename: 'main.js'
     },
     devtool: "source-maps",
