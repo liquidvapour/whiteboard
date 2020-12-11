@@ -1,5 +1,5 @@
 node_modules/
-dist/script/*.js*
+dist/**/*.js*
 dist/maps/
 debug.log
 assets/
