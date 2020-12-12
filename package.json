@@ -9,6 +9,7 @@
     "start:server": "npm run server",
     "start:pack-watch": "npm run pack -- --watch",
     "server": "http-server ./dist/ui -c-1 -o /index.html",
+    "express": "node ./dist/server/main.js",
     "pack": "webpack",
     "lint": "eslint ./src/"
   },
