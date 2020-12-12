@@ -1,0 +1,12 @@
+POST http://127.0.0.1:3000/board/123
+Content-Type: application/json
+
+{
+    "strokes": [
+        {
+            "x": [1, 2, 3, 4, 5],
+            "y": [1, 2, 3, 4, 5],
+            "pressure": [0.9,0.9,0.9,0.9,0.9]
+        }
+    ]
+}

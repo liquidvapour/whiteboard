@@ -9,7 +9,7 @@ app.get('/board/:boardId/*', (req, res) => {
 });
 
 app.post('/board/:boardId', (req, res) => {
-  res.send();
+  res.status(200).send();
 });
 
 app.listen(port, () => {
