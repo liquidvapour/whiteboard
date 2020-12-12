@@ -1,5 +1,10 @@
-POST http://127.0.0.1:3000/board/123
-Content-Type: application/json
+@hostname = 127.0.0.1
+@port = 3000
+@host = {{hostname}}:{{port}}
+
+###
+POST http://{{host}}/board/123
+Content-Type: "application/json"
 
 {
     "strokes": [
@@ -10,3 +15,7 @@ Content-Type: application/json
         }
     ]
 }
+
+###
+GET http://{{host}}/board/123
+Content-Type: application/json

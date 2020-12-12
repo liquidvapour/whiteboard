@@ -11,6 +11,9 @@ module.exports = {
         "ecmaVersion": 11,
         "sourceType": "module"
     },
+    "ignorePatterns": [
+        "dist/**/*.js*"
+    ],
     "rules": {
     }
 };
