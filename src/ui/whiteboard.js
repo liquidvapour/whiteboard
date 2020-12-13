@@ -1,4 +1,5 @@
 import { multiply, identity }  from 'mathjs';
+import axios from 'axios';
 
  //import { scaleAround } from './utils';
 
@@ -33,8 +34,8 @@ function lostcapture_handler() {
 const isPen = (event) => event.pointerType === "pen";
 
 class Strokes {
-    constructor() {
-        this.strokes = [];
+    constructor(strokes = []) {
+        this.strokes = strokes;
         this.currentStroke = null;
     }
 
@@ -104,14 +105,21 @@ const myInv = (m) => ([
     [-m[2][0], -m[2][1], 1]
 ]);
 
-export const start = document => {
+const populateStrokes = async (boardName) => {
+    const response = await axios.get(`http://localhost:3000/board/${boardName}`)
+
+    console.log(`response ${JSON.stringify(response.data)}`);
+    return response.data.strokes;
+};
+
+export const start = async (document, boardName) => {
     const canvas = document.createElement("canvas");
     //const canvas = document.getElementById("canvas");    
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     document.body.append(canvas);
 
-    const strokes = new Strokes();
+    const strokes = new Strokes(await populateStrokes(boardName));
 
     const context = canvas.getContext("2d", { alpha: false });
     context.fillStyle = "#DDDDDD";
@@ -255,4 +263,14 @@ export const start = document => {
     canvas.gotpointercapture = gotcapture_handler;
     canvas.lostpointercapture = lostcapture_handler;
     canvas.oncontextmenu = e => e.preventDefault();
+
+    window.requestAnimationFrame(() => drawTheThings(
+        context,
+        strokes,
+        canvas.width,
+        canvas.height,
+        offset.x,
+        offset.y,
+        scale,
+        scalingCenter));
 };

@@ -7,7 +7,9 @@ const navToBoard = (boardName, formHolder) => {
         window.location.origin + "/ui/" + boardName
     );
     formHolder.remove();
-    start(document);
+    start(document, boardName)
+        .then(() => console.log("start done"))
+        .catch(e => console.log(`error: ${e}`));
 };
 
 const startUp = (document) => {

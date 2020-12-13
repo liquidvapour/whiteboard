@@ -36,7 +36,7 @@ app.post('/board/:boardId', (req, res) => {
   if (!db[boardId]) {
     db[boardId] = { strokes: [] };
   }
-  db[boardId].strokes.push(req.body.strokes);
+  req.body.strokes.forEach(x => db[boardId].strokes.push(x));
   res.status(200).json({});
 });
 
