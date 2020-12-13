@@ -1,4 +1,6 @@
 import * as express from 'express';
+//import * as path from 'path';
+
 //import * as bodyParser from 'body-parser';
 const app = express()
 const port = 3000
@@ -6,7 +8,7 @@ const port = 3000
 const db = {};
 
 app.use(express.json());
-app.use('/ui', express.static('ui'));
+app.use('/ui', express.static('dist/server/ui/'));
 
 app.get('/board/:boardId', (req, res) => {
   const boardId = req.params.boardId;

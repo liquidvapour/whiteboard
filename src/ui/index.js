@@ -1,13 +1,18 @@
-const navToBoard = (boardName) => {
+import { start } from "./whiteboard";
+
+const navToBoard = (boardName, formHolder) => {
     window.history.pushState(
         {}, 
         boardName,
         window.location.origin + "/ui/" + boardName
     );
+    formHolder.remove();
+    start(document);
 };
 
 const startUp = (document) => {
-    const holder = document.createElement("div");
+    const holder = document.createElement("div", { id: "appRoot"});
+
     document.body.append(holder);
 
     const form = document.createElement("form");
@@ -34,7 +39,7 @@ const startUp = (document) => {
     form.append(sub);
 
     form.onsubmit = () => { 
-        navToBoard(input.value);
+        navToBoard(input.value, holder);
         return false;
     };
 
