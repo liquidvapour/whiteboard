@@ -1,28 +1,30 @@
 import * as express from 'express';
+import { AsyncNedb } from 'nedb-async';
 //import * as path from 'path';
 
 //import * as bodyParser from 'body-parser';
 const app = express()
 const port = 3000
 
-const db = {};
+const db = new AsyncNedb();
 
 app.use(express.json());
 app.use('/ui', express.static('dist/server/ui/'));
 
-app.get('/board/:boardId', (req, res) => {
+app.get('/board/:boardId', async (req, res) => {
   const boardId = req.params.boardId;
   res.type('application/json');
-  if (!db[boardId]) {
+  const board = await db.asyncFindOne({ boardId })
+  if (!board) {
     res.status(404).json({ boardId });
   } else {
     res
       .status(200)
-      .json(db[boardId]);
+      .json(board);
   }
 });
 
-app.post('/board/:boardId', (req, res) => {
+app.post('/board/:boardId', async (req, res) => {
   console.log(JSON.stringify(req.body));
   if (!req.body ) {
     res.status(400).json({ error: "no body"});
@@ -33,10 +35,17 @@ app.post('/board/:boardId', (req, res) => {
   }
 
   const boardId = req.params.boardId;
-  if (!db[boardId]) {
-    db[boardId] = { strokes: [] };
+  let board = await db.asyncFindOne({boardId});
+  let dbResult;
+  if (!board) {
+    board = { boardId, strokes: req.body.strokes };
+    dbResult = await db.asyncInsert(board);
+  } else {
+    req.body.strokes.forEach(x => board.strokes.push(x));
+    dbResult = await db.asyncUpdate({ boardId }, board);
+  
   }
-  req.body.strokes.forEach(x => db[boardId].strokes.push(x));
+  console.log(`updateResult: ${dbResult}`);
   res.status(200).json({});
 });
 
