@@ -1,7 +1,5 @@
 import { multiply, identity }  from 'mathjs';
-import axios from 'axios';
-
- //import { scaleAround } from './utils';
+import { populateStrokes, postStroke } from './server';
 
 const getEventInfo = (event) => ({
     pointerId: event.pointerId,
@@ -49,6 +47,10 @@ class Strokes {
         s.x.push(x);
         s.y.push(y);
         s.pressure.push(pressure);
+    }
+
+    getCurrentStroke() {
+        return this.currentStroke;
     }
 }
 
@@ -105,13 +107,6 @@ const myInv = (m) => ([
     [-m[2][0], -m[2][1], 1]
 ]);
 
-const populateStrokes = async (boardName) => {
-    const response = await axios.get(`http://localhost:3000/board/${boardName}`)
-
-    console.log(`response ${JSON.stringify(response.data)}`);
-    return response.data.strokes;
-};
-
 export const start = async (document, boardName) => {
     const canvas = document.createElement("canvas");
     //const canvas = document.getElementById("canvas");    
@@ -135,7 +130,6 @@ export const start = async (document, boardName) => {
     const worldMatrix = matrixCreateDefault().toArray();
     let worldMatrixInv = myInv(worldMatrix);
 
-
     const matrixSetScale = (s) => {
         worldMatrix[0][0] = s;
         worldMatrix[1][1] = s;
@@ -158,8 +152,6 @@ export const start = async (document, boardName) => {
     };
 
     const move_handler = (event) => { 
-        //showInfo("move", event);
-
         if (!isPen(event)) return;
 
         if (drawing) {
@@ -238,6 +230,12 @@ export const start = async (document, boardName) => {
 
     const up_handler = (event) => { 
         if (!isPen(event)) return;
+
+        const lastStroke = strokes.getCurrentStroke();
+
+        postStroke(boardName, lastStroke)
+            .then(success => console.log(`stoke sent success: ${success}`)
+            .catch(e => console.log(`sending stroke failed ${e}`)));
 
         drawing = false;
         event.cancelBubble = true;

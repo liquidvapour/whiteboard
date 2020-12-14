@@ -23,7 +23,7 @@ app.get('/board/:boardId', (req, res) => {
 });
 
 app.post('/board/:boardId', (req, res) => {
-  console.log(JSON.stringify(req.body.strokes));
+  console.log(JSON.stringify(req.body));
   if (!req.body ) {
     res.status(400).json({ error: "no body"});
     return;
