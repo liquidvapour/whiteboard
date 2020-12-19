@@ -6,7 +6,10 @@ import { AsyncNedb } from 'nedb-async';
 const app = express()
 const port = 3000
 
-const db = new AsyncNedb();
+const db = new AsyncNedb({
+  filename: 'localdata/testDataFile',
+  autoload: true
+});
 
 app.use(express.json());
 app.use('/ui', express.static('dist/server/ui/'));
@@ -18,9 +21,10 @@ app.get('/board/:boardId', async (req, res) => {
   if (!board) {
     res.status(404).json({ boardId });
   } else {
+    const _id = undefined;
     res
       .status(200)
-      .json(board);
+      .json({ ...board, _id });
   }
 });
 
@@ -43,10 +47,9 @@ app.post('/board/:boardId', async (req, res) => {
   } else {
     req.body.strokes.forEach(x => board.strokes.push(x));
     dbResult = await db.asyncUpdate({ boardId }, board);
-  
   }
   console.log(`updateResult: ${dbResult}`);
-  res.status(200).json({});
+  res.status(200).json({ result: dbResult });
 });
 
 app.listen(port, () => {
