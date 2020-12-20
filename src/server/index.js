@@ -1,10 +1,11 @@
 import * as express from 'express';
 import { AsyncNedb } from 'nedb-async';
+import { join } from 'path';
 //import * as path from 'path';
 
 //import * as bodyParser from 'body-parser';
-const app = express()
-const port = 3000
+const app = express();
+const port = 3000;
 
 const db = new AsyncNedb({
   filename: 'localdata/testDataFile',
@@ -12,9 +13,14 @@ const db = new AsyncNedb({
 });
 
 app.use(express.json());
-app.use('/ui', express.static('dist/server/ui/'));
+app.use('/front', express.static('dist/server/front/'));
+app.use('/ui*', (req, res) => {
+  const a = __dirname;
+  console.log(`meta: ${a}`);
+  res.sendFile(join(__dirname, '/ui/index.html'));
+});
 
-app.get('/board/:boardId', async (req, res) => {
+app.get('/back/board/:boardId', async (req, res) => {
   const boardId = req.params.boardId;
   res.type('application/json');
   const board = await db.asyncFindOne({ boardId })
@@ -28,7 +34,7 @@ app.get('/board/:boardId', async (req, res) => {
   }
 });
 
-app.post('/board/:boardId', async (req, res) => {
+app.post('/back/board/:boardId', async (req, res) => {
   console.log(JSON.stringify(req.body));
   if (!req.body ) {
     res.status(400).json({ error: "no body"});

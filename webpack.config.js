@@ -8,10 +8,10 @@ module.exports = [{
       main: './src/ui/index.js',      
     },
     output: {
-        path: path.resolve(__dirname, 'dist/server/ui/script'),
+        path: path.resolve(__dirname, 'dist/server/front/script'),
         filename: 'main.js'
     },
-    devtool: "source-maps",
+    devtool: "source-maps", 
     module: {
       rules: [
         {
@@ -33,6 +33,7 @@ module.exports = [{
     target: 'node',
     externals: [nodeExternals()],    
     devtool: "source-maps",
+    node: { __dirname: false },
     module: {
       rules: [
         {

@@ -5,11 +5,13 @@
   "private": true,
   "scripts": {
     "test": "mocha \"./src/*.spec.js\" --require esm",
-    "start": "npm-run-all start:*",
+    "start": "npm run express",
+    "build": "npm run pack",
     "start:server": "npm run server",
     "start:pack-watch": "npm run pack -- --watch",
     "server": "http-server ./dist/ui -c-1 -o /index.html",
-    "express": "cross-env DEBUG=express:* nodemon --enable-source-maps ./dist/server/main.js",
+    "express-dev": "cross-env DEBUG=express:* nodemon --enable-source-maps ./dist/server/main.js",
+    "express": "cross-env DEBUG=express:* node ./dist/server/main.js",
     "pack": "webpack",
     "lint": "eslint ./src/"
   },
