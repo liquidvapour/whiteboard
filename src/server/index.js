@@ -5,7 +5,7 @@ import { join } from 'path';
 
 //import * as bodyParser from 'body-parser';
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 const db = new AsyncNedb({
   filename: 'localdata/testDataFile',
