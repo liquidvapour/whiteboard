@@ -1,5 +1,8 @@
 import axios from 'axios';
-const root = 'http://localhost:3000/back/board';
+const root = '/back/board';
+
+console.log(`app root url: `)
+
 export const populateStrokes = async (boardName) => {
     const response = await axios.get(`${root}/${boardName}`)
 
