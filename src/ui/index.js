@@ -18,15 +18,20 @@ const navToBoard = (boardName, formHolder) => {
 
 const uiBoardPathMatcher = new RegExp('/ui/(?<boardId>[0-9a-z-]+)');
 
+const parseUrl = (pathname) => {
+    const boardIdMatch = pathname.match(uiBoardPathMatcher);
+    return boardIdMatch && boardIdMatch.groups && boardIdMatch.groups.boardId; 
+}
+
 const startUp = (document) => {
 
     const holder = document.createElement("div", { id: "appRoot"});
     document.body.append(holder);
 
-    const boardIdMatch = window.location.pathname.match(uiBoardPathMatcher);
+    const boardId = parseUrl(window.location.pathname);
 
-    if (boardIdMatch && boardIdMatch.groups && boardIdMatch.groups.boardId) {
-        navToBoard(boardIdMatch.groups.boardId, holder);
+    if (boardId) {
+        navToBoard(boardId, holder);
     } else {
         ReactDOM.render(
             <BoardForm onSubmit={boardId => navToBoard(boardId, holder)}/>, 
