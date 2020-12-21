@@ -5,8 +5,7 @@ export class BoardForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            boardId: props.boardId,
-            onSubmit: props.onSubmit
+            boardId: props.boardId || ''
         };
     }
 
@@ -16,7 +15,7 @@ export class BoardForm extends Component {
 
     onSubmit(e) {
         e.preventDefault();
-        this.state.onSubmit(this.state.boardId);
+        this.props.onSubmit(this.state.boardId);
     }
 
     render() {
@@ -37,6 +36,6 @@ export class BoardForm extends Component {
     }
 }
 BoardForm.propTypes = {
-    boardId: PropTypes.string.isRequired,
+    boardId: PropTypes.string,
     onSubmit: PropTypes.func.isRequired
 };

@@ -32,10 +32,7 @@ const startUp = (document) => {
     document.body.append(holder);
 
     ReactDOM.render(
-        <BoardForm 
-            boardId='123' 
-            onSubmit={boardId => navToBoard(boardId, holder)} 
-        />, 
+        <BoardForm onSubmit={boardId => navToBoard(boardId, holder)}/>, 
         holder);
 };
 
