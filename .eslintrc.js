@@ -6,7 +6,10 @@ module.exports = {
         "mocha": true,
         "node": true,
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended"
+    ],
     "parserOptions": {
         "ecmaVersion": 11,
         "sourceType": "module"
@@ -15,5 +18,10 @@ module.exports = {
         "dist/**/*.js*"
     ],
     "rules": {
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
     }
 };

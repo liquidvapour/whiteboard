@@ -17,21 +17,32 @@
   },
   "author": "",
   "license": "ISC",
+  "browserslist": [
+    "chrome >= 85"
+  ],
   "dependencies": {
-    "@babel/core": "^7.10.5",
     "axios": "^0.21.0",
     "body-parser": "^1.19.0",
+    "caniuse-lite": "^1.0.30001170",
     "express": "^4.17.1",
     "http-server": "^0.12.3",
     "mathjs": "^8.1.0",
-    "nedb-async": "^0.1.6"
+    "nedb-async": "^0.1.6",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
   },
   "devDependencies": {
-    "babel-loader": "^8.1.0",
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-transform-runtime": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-react": "^7.12.10",
+    "babel-loader": "^8.2.2",
     "chai": "^4.2.0",
     "cross-env": "^7.0.3",
     "eslint": "^7.5.0",
     "eslint-loader": "^4.0.2",
+    "eslint-plugin-react": "^7.21.5",
     "esm": "^3.2.25",
     "mocha": "^7.2.0",
     "nodemon": "^2.0.6",

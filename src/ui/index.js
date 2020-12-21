@@ -1,4 +1,8 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import { start } from "./whiteboard";
+import { BoardForm } from "./boardForm";
 
 const navToBoard = (boardName, formHolder) => {
     window.history.pushState(
@@ -25,37 +29,14 @@ const startUp = (document) => {
         return false;
     }
 
-
     document.body.append(holder);
 
-    const form = document.createElement("form");
-    holder.append(form);
-
-    const p1 = document.createElement("p");
-    form.append(p1);
-
-    const label = document.createElement("label");
-    label.id = "lblBoard";
-    label.for = "txtBoard";
-    label.innerHTML = "board:";
-    p1.append(label);
-
-    const input = document.createElement("input");
-    input.id = "txtBoard";
-    input.type = "text";
-    input.name = "board"
-    p1.append(input)
-
-
-    const sub = document.createElement("input");
-    sub.type = "submit";
-    form.append(sub);
-
-    form.onsubmit = () => { 
-        navToBoard(input.value, holder);
-        return false;
-    };
-
+    ReactDOM.render(
+        <BoardForm 
+            boardId='123' 
+            onSubmit={boardId => navToBoard(boardId, holder)} 
+        />, 
+        holder);
 };
 
 startUp(document);
