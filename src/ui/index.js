@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { start } from "./whiteboard";
+import { start as startWhiteboard } from "./whiteboard";
 import { BoardForm } from "./boardForm";
 
 const navToBoard = (boardName, formHolder) => {
@@ -11,7 +11,7 @@ const navToBoard = (boardName, formHolder) => {
         window.location.origin + "/ui/" + boardName
     );
     formHolder.remove();
-    start(document, boardName)
+    startWhiteboard(document, boardName)
         .then(() => console.log("start done"))
         .catch(e => console.log(`error: ${e}`));
 };
