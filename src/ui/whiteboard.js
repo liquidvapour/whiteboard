@@ -31,6 +31,12 @@ function lostcapture_handler() {
 
 const isPen = (event) => event.pointerType === "pen";
 
+const len = (ax, ay, bx, by) => {
+    const xLen = ax - bx;
+    const yLen = ay - by;
+    return Math.sqrt(xLen * xLen + yLen * yLen);
+};
+
 class Strokes {
     constructor(strokes = []) {
         this.strokes = strokes;
@@ -42,11 +48,24 @@ class Strokes {
         this.strokes.push(this.currentStroke);
     }
 
+    lengthToLastPoint(x, y) {
+        const l = this.currentStroke.x.length;
+        const ax = this.currentStroke.x[l - 1];
+        const ay = this.currentStroke.y[l - 1];
+        return len(ax, ay, x, y);
+    }
+
     addPointToStroke(x, y, pressure) {
         const s = this.currentStroke;
-        s.x.push(x);
-        s.y.push(y);
-        s.pressure.push(pressure);
+        const lenToPoint = this.lengthToLastPoint(x, y);
+        console.log(`len to last point: ${lenToPoint}`);
+        if (lenToPoint > 10) {
+            s.x.push(Math.round(x));
+            s.y.push(Math.round(y));
+            s.pressure.push(pressure);
+        } else {
+            console.log(`skipped {x:${x}, y:${y}} len:${lenToPoint}`);
+        }
     }
 
     getCurrentStroke() {
@@ -144,10 +163,10 @@ export const start = async (document, boardName) => {
 
     const screenToWorld = (x, y) => {
         const r = multiply([x, y, 1], worldMatrixInv);
-        console.log(`world: ${worldMatrix}`);
-        console.log(`worldInv: ${worldMatrixInv}`);
-        console.log(`screen {x: ${x}, y: ${y}}`);
-        console.log(`world {x: ${r[0]}, y: ${r[1]}}`);
+        // console.log(`world: ${worldMatrix}`);
+        // console.log(`worldInv: ${worldMatrixInv}`);
+        // console.log(`screen {x: ${x}, y: ${y}}`);
+        // console.log(`world {x: ${r[0]}, y: ${r[1]}}`);
         return { x: r[0], y: r[1] };
     };
 
