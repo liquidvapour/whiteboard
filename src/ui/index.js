@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import { start as startWhiteboard } from "./whiteboard";
 import { BoardForm } from "./boardForm";
+import { App } from "./app";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -36,7 +37,7 @@ const startUp = (document) => {
         navToBoard(boardId, holder);
     } else {
         ReactDOM.render(
-            <BoardForm onSubmit={boardId => navToBoard(boardId, holder)}/>, 
+            <App><BoardForm onSubmit={boardId => navToBoard(boardId, holder)}/></App>, 
             holder);
     }
 };
