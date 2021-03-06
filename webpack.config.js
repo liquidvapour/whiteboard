@@ -11,25 +11,26 @@ module.exports = [{
     path: path.resolve(__dirname, 'dist/server/front/script'),
     filename: 'main.js'
   },
-  devtool: "source-maps",
+  devtool: "source-map",
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        loader: [
+        use: [
           'eslint-loader',
           {
-            loader: 'babel-loader', 
+            loader: 'babel-loader',
             options: {
-            "presets": [
-              "@babel/preset-env",
-              "@babel/preset-react"
-            ],
-            "plugins": [
-              ["@babel/transform-runtime"]
-            ]
-          }}
+              "presets": [
+                "@babel/preset-env",
+                "@babel/preset-react"
+              ],
+              "plugins": [
+                ["@babel/transform-runtime"]
+              ]
+            }
+          }
         ]
       }
     ]
@@ -48,7 +49,7 @@ module.exports = [{
   },
   target: 'node',
   externals: [nodeExternals()],
-  devtool: "source-maps",
+  devtool: "source-map",
   node: { __dirname: false },
   module: {
     rules: [
