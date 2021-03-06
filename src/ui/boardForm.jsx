@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
 
 export class BoardForm extends Component {
     constructor(props) {
@@ -20,18 +22,17 @@ export class BoardForm extends Component {
 
     render() {
         return (
-            <form onSubmit={e => this.onSubmit(e)}>
-                <p>
-                    <label id='lblBoard' htmlFor='txtBoard'>board id:</label>
-                    <input 
-                        id='txtBoard' 
+            <Form onSubmit={e => this.onSubmit(e)}>
+                <Form.Group>
+                    <Form.Label>board id</Form.Label>
+                    <Form.Control 
                         type='text' 
-                        name='boardId'
                         value={this.state.boardId}
-                        onChange={e => this.onTxtBoardChange(e)} />
-                    <input type='submit' value='Submit' />
-                </p>
-            </form>
+                        onChange={e => this.onTxtBoardChange(e)} >
+                    </Form.Control>
+                    <Button variant="primary" type="submit">Submit</Button>
+                </Form.Group>
+            </Form>
         );
     }
 }

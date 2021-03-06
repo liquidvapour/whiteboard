@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom';
 import { start as startWhiteboard } from "./whiteboard";
 import { BoardForm } from "./boardForm";
 
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 const navToBoard = (boardName, formHolder) => {
     window.history.pushState(
         {}, 
