@@ -2,6 +2,7 @@ import React from 'react';
 import { PropTypes } from 'prop-types';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 export class BoardForm extends React.Component {
     constructor(props) {
@@ -26,13 +27,21 @@ export class BoardForm extends React.Component {
         return (
             <Form onSubmit={this.onSubmit}>
                 <Form.Group>
-                    <Form.Label>board id</Form.Label>
-                    <Form.Control
-                        type='text'
-                        value={this.state.boardId}
-                        onChange={this.onTxtBoardChange} >
-                    </Form.Control>
-                    <Button variant="primary" type="submit">Submit</Button>
+                    <InputGroup>
+                        <InputGroup.Prepend>
+                            <InputGroup.Text id="board-id">
+                                board id
+                            </InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <Form.Control
+                            type='text'
+                            aria-describedby="board-id"
+                            value={this.state.boardId}
+                            onChange={this.onTxtBoardChange} >
+                        </Form.Control>
+                    </InputGroup>
+                    <br/>
+                    <Button variant="primary" type="submit">Go!</Button>
                 </Form.Group>
             </Form>
         );
